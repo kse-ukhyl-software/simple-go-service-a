@@ -24,6 +24,10 @@ jobs:
       new_tag: ${{ steps.increment.outputs.new_tag }}
       current_tag: ${{ steps.get_tag.outputs.current_tag }}
     steps:
+      - name: Setup Git Bash
+        shell: pwsh
+        run: echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -32,7 +36,7 @@ jobs:
 
       - name: Get latest tag
         id: get_tag
-        shell: C:\Program Files\Git\bin\bash.exe --noprofile --norc -e -o pipefail {0}
+        shell: bash
         run: |
           git fetch --tags
           latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
@@ -41,7 +45,7 @@ jobs:
 
       - name: Increment version
         id: increment
-        shell: C:\Program Files\Git\bin\bash.exe --noprofile --norc -e -o pipefail {0}
+        shell: bash
         run: |
           current_tag="${{ steps.get_tag.outputs.current_tag }}"
           version_type="${{ github.event.inputs.version_type }}"
@@ -66,7 +70,7 @@ jobs:
           echo "New tag: $new_tag"
 
       - name: Create and push tag
-        shell: C:\Program Files\Git\bin\bash.exe --noprofile --norc -e -o pipefail {0}
+        shell: bash
         run: |
           new_tag="${{ steps.increment.outputs.new_tag }}"
 
@@ -79,7 +83,7 @@ jobs:
           echo "Created and pushed tag: $new_tag"
 
       - name: Create GitHub Release
-        shell: C:\Program Files\Git\bin\bash.exe --noprofile --norc -e -o pipefail {0}
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -102,8 +106,12 @@ jobs:
     needs: [increment-version, build-and-release]
     runs-on: self-hosted
     steps:
+      - name: Setup Git Bash
+        shell: pwsh
+        run: echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
       - name: Summary
-        shell: C:\Program Files\Git\bin\bash.exe --noprofile --norc -e -o pipefail {0}
+        shell: bash
         run: |
           echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
