@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   increment-version:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       new_tag: ${{ steps.increment.outputs.new_tag }}
       current_tag: ${{ steps.get_tag.outputs.current_tag }}
@@ -96,7 +96,7 @@ jobs:
 
   summary:
     needs: [increment-version, build-and-release]
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Summary
         run: |
