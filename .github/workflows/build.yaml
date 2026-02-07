@@ -3,12 +3,8 @@ name: CI
 on:
   push:
     branches: [main]
-    paths:
-      - 'ci-cd-security/example-service/**'
   pull_request:
     branches: [main]
-    paths:
-      - 'ci-cd-security/example-service/**'
   workflow_dispatch:
 
 jobs:
@@ -16,4 +12,3 @@ jobs:
     uses: kse-bd8338bbe006/kse-labs-trusted-workflows/.github/workflows/go-ci.yaml@main
     with:
       go-version: '1.21'
-      working-directory: ci-cd-security/example-service
