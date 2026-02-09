@@ -6,7 +6,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /app
 
 # Copy pre-built binary from build context
-ARG BINARY_PATH=example-service
+ARG BINARY_PATH
 COPY ${BINARY_PATH} /app/server
 
 RUN chmod +x /app/server
