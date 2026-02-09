@@ -108,6 +108,8 @@ jobs:
       binary-name: ${{ github.event.repository.name }}
       image-name: ${{ github.event.repository.name }}
       release-tag: ${{ needs.increment-version.outputs.new_tag }}
+      goos: ${{ needs.increment-version.outputs.goos }}
+      goarch: ${{ needs.increment-version.outputs.goarch }}
 
   summary:
     needs: [increment-version, build-and-release]
