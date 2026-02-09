@@ -10,5 +10,6 @@ on:
 jobs:
   build:
     uses: kse-bd8338bbe006/kse-labs-trusted-workflows/.github/workflows/go-ci.yaml@main
+    secrets: inherit
     with:
       go-version: '1.21'

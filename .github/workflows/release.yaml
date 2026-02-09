@@ -23,10 +23,18 @@ jobs:
     outputs:
       new_tag: ${{ steps.increment.outputs.new_tag }}
       current_tag: ${{ steps.get_tag.outputs.current_tag }}
+      goos: ${{ steps.platform.outputs.goos }}
+      goarch: ${{ steps.platform.outputs.goarch }}
     steps:
-      # - name: Setup Git Bash
-      #   shell: pwsh
-      #   run: echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Detect platform
+        id: platform
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            macOS)   echo "goos=darwin"  >> $GITHUB_OUTPUT; echo "goarch=arm64" >> $GITHUB_OUTPUT ;;
+            Windows) echo "goos=windows" >> $GITHUB_OUTPUT; echo "goarch=amd64" >> $GITHUB_OUTPUT ;;
+            Linux)   echo "goos=linux"   >> $GITHUB_OUTPUT; echo "goarch=amd64" >> $GITHUB_OUTPUT ;;
+          esac
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -50,14 +58,15 @@ jobs:
           current_tag="${{ steps.get_tag.outputs.current_tag }}"
           version_type="${{ github.event.inputs.version_type }}"
 
+          # Validate tag format (must be vX.Y.Z)
+          if [[ ! "$current_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid tag format: $current_tag (expected vX.Y.Z)"
+            exit 1
+          fi
+
           # Remove 'v' prefix and split
           version=${current_tag#v}
           IFS='.' read -r major minor patch <<< "$version"
-
-          # Default to 0 if empty
-          major=${major:-0}
-          minor=${minor:-0}
-          patch=${patch:-0}
 
           case $version_type in
             major) major=$((major + 1)); minor=0; patch=0 ;;
@@ -93,20 +102,19 @@ jobs:
   build-and-release:
     needs: increment-version
     uses: kse-bd8338bbe006/kse-labs-trusted-workflows/.github/workflows/go-docker-release.yaml@main
+    secrets: inherit
     with:
       go-version: '1.21'
       binary-name: ${{ github.event.repository.name }}
       image-name: ${{ github.event.repository.name }}
       release-tag: ${{ needs.increment-version.outputs.new_tag }}
+      goos: ${{ needs.increment-version.outputs.goos }}
+      goarch: ${{ needs.increment-version.outputs.goarch }}
 
   summary:
     needs: [increment-version, build-and-release]
     runs-on: self-hosted
     steps:
-      # - name: Setup Git Bash
-      #   shell: pwsh
-      #   run: echo "C:\Program Files\Git\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-
       - name: Summary
         shell: bash
         run: |
@@ -118,7 +126,7 @@ jobs:
           echo "- **Increment type**: ${{ github.event.inputs.version_type }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
-          echo "- **Binary**: ${{ github.event.repository.name }}-${{ needs.increment-version.outputs.new_tag }}-linux-amd64.tar.gz" >> $GITHUB_STEP_SUMMARY
+          echo "- **Binary**: ${{ github.event.repository.name }}-${{ needs.increment-version.outputs.new_tag }}-${{ needs.increment-version.outputs.goos }}-${{ needs.increment-version.outputs.goarch }}.tar.gz" >> $GITHUB_STEP_SUMMARY
           echo "- **Docker**: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:${{ needs.increment-version.outputs.new_tag }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "[View Release](https://github.com/${{ github.repository }}/releases/tag/${{ needs.increment-version.outputs.new_tag }})" >> $GITHUB_STEP_SUMMARY
