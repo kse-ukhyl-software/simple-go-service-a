@@ -104,7 +104,7 @@ func versionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := map[string]string{
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"service": "example-service",
 	}
 	jsonResponse(w, http.StatusOK, resp)
