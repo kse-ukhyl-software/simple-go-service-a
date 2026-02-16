@@ -66,7 +66,7 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := HelloResponse{
-		Greeting:  "Welcome, " + name + "! This is the new feature hello endpoint.",
+		Greeting:  "Welcome, " + name + "! This is the hello endpoint.",
 		Timestamp: time.Now().UTC().Format(time.RFC3339),
 	}
 	jsonResponse(w, http.StatusOK, resp)
@@ -115,4 +115,3 @@ func jsonResponse(w http.ResponseWriter, status int, data interface{}) {
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(data)
 }
-
