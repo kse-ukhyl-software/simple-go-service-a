@@ -27,14 +27,13 @@ jobs:
     steps:
       - name: Detect platform
         id: platform
-        shell: bash
+        shell: 'C:\Program Files\Git\bin\bash.exe -e {0}'
         run: |
           case "$RUNNER_OS" in
             macOS)   echo "goarch=arm64" >> $GITHUB_OUTPUT ;;
             Windows) echo "goarch=amd64" >> $GITHUB_OUTPUT ;;
             Linux)   echo "goarch=amd64" >> $GITHUB_OUTPUT ;;
           esac
-       shell: 'C:\Program Files\Git\bin\bash.exe -e {0}'
        
       - name: Checkout
         uses: actions/checkout@v4
