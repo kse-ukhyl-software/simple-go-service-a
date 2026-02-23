@@ -34,7 +34,8 @@ jobs:
             Windows) echo "goarch=amd64" >> $GITHUB_OUTPUT ;;
             Linux)   echo "goarch=amd64" >> $GITHUB_OUTPUT ;;
           esac
-
+       shell: 'C:\Program Files\Git\bin\bash.exe -e {0}'
+       
       - name: Checkout
         uses: actions/checkout@v4
         with:
