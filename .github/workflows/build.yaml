@@ -20,8 +20,9 @@ jobs:
     if: always()
     steps:
       - name: Check CI result
+        shell: pwsh
         run: |
-          if [ "${{ needs.build.result }}" != "success" ]; then
-            echo "CI failed"
+          if ("${{ needs.build.result }}" -ne "success") {
+            Write-Host "CI failed"
             exit 1
-          fi      
+          }
