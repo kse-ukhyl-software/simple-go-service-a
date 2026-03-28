@@ -120,7 +120,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
       - name: Pull secret scanner
-        run: docker pull ghcr.io/kse-ukhyl-software/secret-scan-toolt:latest
+        run: docker pull ghcr.io/kse-ukhyl-software/secret-scan-tool:latest
       - name: Run secret scan
         run: |
           docker run --rm \
